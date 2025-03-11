@@ -27,6 +27,10 @@ Ball.prototype.draw = function() {
   ctx.fillStyle = this.color;
   ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
   ctx.fill();
+
+  ctx.lineWidth = 2;   
+  ctx.strokeStyle = 'black'; 
+  ctx.stroke();           
 }
 
 let testBall = new Ball(50, 100, 4, 4, 'blue', 10);
@@ -53,29 +57,35 @@ Ball.prototype.update = function() {
 }
 
 
+let collidedPairs = new Set();
+
 Ball.prototype.collisionDetect = function() {
   for (let j = 0; j < balls.length; j++) {
-    if (!(this === balls[j])) {
+    if (this !== balls[j]) {
       const dx = this.x - balls[j].x;
       const dy = this.y - balls[j].y;
       const distance = Math.sqrt(dx * dx + dy * dy);
+      const minDistance = this.size + balls[j].size;
 
-      if (distance < this.size + balls[j].size) {
-        this.size *= 2;
-        balls[j].size *= 2;
+      const pairKey = `${Math.min(balls.indexOf(this), balls.indexOf(balls[j]))}-${Math.max(balls.indexOf(this), balls.indexOf(balls[j]))}`;
+
+      if (distance < minDistance) { 
+        if (!collidedPairs.has(pairKey)) {
+          this.size += 1;  
+          balls[j].size += 1;
+        }
+        collidedPairs.add(pairKey); 
       }
     }
   }
-}
+};
 
 
 let balls = [];
 
-while (balls.length < 25) {
+while (balls.length < 100) {
   let size = random(1, 1);
   let ball = new Ball(
-    // ball position always drawn at least one ball width
-    // away from the edge of the canvas, to avoid drawing errors
     random(0 + size,width - size),
     random(0 + size,height - size),
     random(-7,7),
@@ -89,7 +99,7 @@ while (balls.length < 25) {
 }
 
 function loop() {
-  ctx.fillStyle = 'white';
+  ctx.fillStyle = 'gray';
   ctx.fillRect(0, 0, width, height);
   
 
@@ -104,16 +114,16 @@ function loop() {
 
 loop();
 
-document.addEventListener('keydown', function(event) {
-  if (event.key === ' ') { // Check if the spacebar is pressed
-      // Your code here
-      console.log('Spacebar was pressed!');
-  }
-});
+// document.addEventListener('keydown', function(event) {
+//   if (event.key === ' ') { // Check if the spacebar is pressed
+//       // Your code here
+//       console.log('Spacebar was pressed!');
+//   }
+// });
 
-document.addEventListener('keyup', function(event) {
-  if (event.key === ' ') {
-      // Your code here
-      console.log('Spacebar was released!');
-  }
-});
+// document.addEventListener('keyup', function(event) {
+//   if (event.key === ' ') {
+//       // Your code here
+//       console.log('Spacebar was released!');
+//   }
+// });
